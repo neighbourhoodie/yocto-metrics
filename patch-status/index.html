@@ -1,0 +1,142 @@
+<html>
+    <head>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>Patch Upstream-Status Values</h1>
+        <div id="upstream_status_chart"></div>
+
+        <h1>Patch Tag Errors</h1>
+        <div id="malformed_chart"></div>
+
+        <h1>Current Patch Status Pie</h1>
+        <div id="status_pie_chart"></div>
+
+        <h2>Raw Data</h2>
+        <ul>
+        <li><a href="status.json">status.json</a></li>
+        <li><a href="releases.csv">releases.csv</a></li>
+        </ul>
+
+        <script type="text/javascript">
+            var valid_status = ['pending', 'backport', 'inappropriate', 'accepted', 'submitted', 'denied'];
+            var label_names = {
+                pending: "Pending",
+                backport: "Backport",
+                inappropriate: "Inappropriate",
+                accepted: "Accepted",
+                submitted: "Submitted",
+                denied: "Denied",
+                total: "Total",
+                'malformed-sob': "Malformed Signed-off-by",
+                'malformed-upstream-status': "Malformed Upstream-Status"
+            };
+
+            /* Probably easier if the mining code writes a file with just the latest numbers in? */
+            d3.json("status.json").then(function(data) {
+                /* Sort so highest date is first */
+                data.sort(function (a,b) {
+                    return b.date - a.date;
+                });
+                var chart = c3.generate({
+                    bindto: '#status_pie_chart',
+                    data: {
+                        json: [data[0]],
+                        keys: {
+                            value: valid_status
+                        },
+                        type: "pie",
+                        names: label_names
+                    },
+                    pie: {
+                        label: {
+                            format: function (value, ratio, id) {
+                                return d3.format('.0%')(ratio);
+                            }
+                        }
+                    }
+                });
+            });
+
+            d3.dsv(",", "releases.csv", function(d) {
+                return {
+                    value: new Date(d.Date),
+                    text: d.Name
+                };
+            }).then(function(release_lines) {
+                d3.json("status.json").then(function(status_data) {
+                    var chart = c3.generate({
+                        bindto: '#upstream_status_chart',
+                        data: {
+                            json: status_data,
+                            xFormat: "%s",
+                            keys: {
+                                x: "date",
+                                value: valid_status.concat(['total'])
+                            },
+                            type: "area",
+                            groups: [valid_status, ['total']],
+                            names: label_names
+                        },
+                        axis: {
+                            x: {
+                                type: 'timeseries',
+                                tick: {
+                                    format: '%Y-%m-%d'
+                                },
+                                localtime: false
+                            }
+                        },
+                        grid: {
+                            x: {
+                                lines: release_lines
+                            },
+                            y: {
+                                show: true
+                            }
+                        },
+                        zoom: {
+                            enabled: true
+                        }
+                    });
+
+                    var chart = c3.generate({
+                        bindto: '#malformed_chart',
+                        data: {
+                            json: status_data,
+                            xFormat: "%s",
+                            keys: {
+                                x: "date",
+                                value: ['total', 'malformed-upstream-status', 'malformed-sob']
+                            },
+                            type: "area",
+                            names: label_names
+                        },
+                        axis: {
+                            x: {
+                                type: 'timeseries',
+                                tick: {
+                                    format: '%Y-%m-%d'
+                                },
+                                localtime: false
+                            }
+                        },
+                        grid: {
+                            x: {
+                                lines: release_lines
+                            },
+                            y: {
+                                show: true
+                            }
+                        },
+                        zoom: {
+                            enabled: true
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
