@@ -16,7 +16,7 @@
 
         <h2>Raw Data</h2>
         <ul>
-        <li><a href="status.json">status.json</a></li>
+        <li><a href="patch-status.json">patch-status.json</a></li>
         <li><a href="releases.csv">releases.csv</a></li>
         </ul>
 
@@ -35,7 +35,7 @@
             };
 
             /* Probably easier if the mining code writes a file with just the latest numbers in? */
-            d3.json("status.json").then(function(data) {
+            d3.json("patch-status.json").then(function(data) {
                 /* Sort so highest date is first */
                 data.sort(function (a,b) {
                     return b.date - a.date;
@@ -66,7 +66,7 @@
                     text: d.Name
                 };
             }).then(function(release_lines) {
-                d3.json("status.json").then(function(status_data) {
+                d3.json("patch-status.json").then(function(status_data) {
                     var chart = c3.generate({
                         bindto: '#upstream_status_chart',
                         data: {
