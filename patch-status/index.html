@@ -6,6 +6,11 @@ SPDX-License-Identifier: MIT
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.css" rel="stylesheet">
+        <style>
+            .c3-line {
+                stroke-width: 2px;
+            }
+        </style>
     </head>
     <body>
         <h1>Current CVE status</h1>
@@ -121,6 +126,9 @@ SPDX-License-Identifier: MIT
                         },
                         line: {
                             connectNull: true
+                        },
+                        point: {
+                            show: false
                         }
                     });
 
@@ -167,6 +175,9 @@ SPDX-License-Identifier: MIT
                         },
                         zoom: {
                             enabled: true
+                        },
+                        point: {
+                            show: false
                         }
                     });
 
@@ -201,6 +212,9 @@ SPDX-License-Identifier: MIT
                         },
                         zoom: {
                             enabled: true
+                        },
+                        point: {
+                            show: false
                         }
                     });
                     var chart = c3.generate({
@@ -234,6 +248,9 @@ SPDX-License-Identifier: MIT
                         },
                         zoom: {
                             enabled: true
+                        },
+                        point: {
+                            show: false
                         }
                     });
 
