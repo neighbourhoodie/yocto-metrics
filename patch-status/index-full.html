@@ -20,8 +20,6 @@ SPDX-License-Identifier: MIT
         <li><a href="cve-status-dunfell.txt">dunfell</a></li>
         </ul>
 
-        <p><a href="index-full.html">Multi year data</a></p>
-
         <h1>CVE Trends for OE-Core/Poky</h1>
         <div id="cve_chart"></div>
 
@@ -41,8 +39,8 @@ SPDX-License-Identifier: MIT
         <ul>
         <li><a href="patch-status.json">patch-status.json</a></li>
         <li><a href="patch-status-pie.json">patch-status-pie.json</a></li>
-        <li><a href="patch-status-byday-lastyear.json">patch-status-byday.json</a></li>
-        <li><a href="cve-count-byday-lastyear.json">cve-count-byday.json</a></li>
+        <li><a href="patch-status-byday.json">patch-status-byday.json</a></li>
+        <li><a href="cve-count-byday.json">cve-count-byday.json</a></li>
         <li><a href="releases.csv">releases.csv</a></li>
         </ul>
 
@@ -87,7 +85,7 @@ SPDX-License-Identifier: MIT
                     text: d.Name
                 };
             }).then(function(release_lines) {
-                d3.json("cve-count-byday-lastyear.json").then(function(cve_data) {
+                d3.json("cve-count-byday.json").then(function(cve_data) {
                     cve_data2 = []
                     for (var key in cve_data) {
                         cve_data[key].date = key
@@ -144,7 +142,7 @@ SPDX-License-Identifier: MIT
                     text: d.Name
                 };
             }).then(function(release_lines) {
-                d3.json("patch-status-byday-lastyear.json").then(function(status_data) {
+                d3.json("patch-status-byday.json").then(function(status_data) {
                     var chart = c3.generate({
                         bindto: '#upstream_status_chart',
                         data: {
