@@ -3,12 +3,12 @@
 SPDX-License-Identifier: MIT
 -->
     <head>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/d3@^6.1"></script>
+        <link rel="stylesheet" href="https://naver.github.io/billboard.js/release/latest/dist/theme/modern.css">
+        <script src="https://cdn.jsdelivr.net/npm/billboard.js"></script>
         <style>
-            .c3-line {
-                stroke-width: 2px;
+            .bb-line {
+                stroke-width: 1.5px;
             }
         </style>
     </head>
@@ -40,10 +40,10 @@ SPDX-License-Identifier: MIT
 
         <h2>Raw Data</h2>
         <ul>
-        <li><a href="patch-status.json">patch-status.json</a></li>
+        <li><a href="../patch-status.json">patch-status.json</a></li>
         <li><a href="patch-status-pie.json">patch-status-pie.json</a></li>
         <li><a href="patch-status-byday-lastyear.json">patch-status-byday.json</a></li>
-        <li><a href="cve-count-byday-lastyear.json">cve-count-byday.json</a></li>
+        <li><a href="../cve-count-byday-lastyear.json">cve-count-byday.json</a></li>
         <li><a href="releases.csv">releases.csv</a></li>
         </ul>
 
@@ -62,7 +62,7 @@ SPDX-License-Identifier: MIT
             };
 
             d3.json("patch-status-pie.json").then(function(data) {
-                var chart = c3.generate({
+                var chart = bb.generate({
                     bindto: '#status_pie_chart',
                     data: {
                         json: [data],
@@ -88,14 +88,14 @@ SPDX-License-Identifier: MIT
                     text: d.Name
                 };
             }).then(function(release_lines) {
-                d3.json("cve-count-byday-lastyear.json").then(function(cve_data) {
+                d3.json("../cve-count-byday-lastyear.json").then(function(cve_data) {
                     cve_data2 = []
                     for (var key in cve_data) {
                         cve_data[key].date = key
                         cve_data2.push(cve_data[key])
                     }
 
-                    var chart = c3.generate({
+                    var chart = bb.generate({
                         bindto: '#cve_chart',
                         data: {
                             json: cve_data2,
@@ -150,7 +150,7 @@ SPDX-License-Identifier: MIT
                 };
             }).then(function(release_lines) {
                 d3.json("patch-status-byday-lastyear.json").then(function(status_data) {
-                    var chart = c3.generate({
+                    var chart = bb.generate({
                         bindto: '#upstream_status_chart',
                         data: {
                             json: status_data,
@@ -188,7 +188,7 @@ SPDX-License-Identifier: MIT
                         }
                     });
 
-                    var chart = c3.generate({
+                    var chart = bb.generate({
                         bindto: '#malformed_chart',
                         data: {
                             json: status_data,
@@ -224,7 +224,7 @@ SPDX-License-Identifier: MIT
                             show: false
                         }
                     });
-                    var chart = c3.generate({
+                    var chart = bb.generate({
                         bindto: '#recipe_count_chart',
                         data: {
                             json: status_data,
