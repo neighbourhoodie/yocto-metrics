@@ -10,16 +10,77 @@ SPDX-License-Identifier: MIT
             .bb-line {
                 stroke-width: 1.5px;
             }
+            .cve-status {
+                display: flex;
+                margin: 0 44px;
+                align-items: stretch;
+            }
+            .cve-status > details {
+                flex: 1;
+            }
+            details summary::-webkit-details-marker {
+                display:none;
+            }
+            details > summary {
+              list-style: none;
+              cursor: pointer;
+              font-weight: bold;
+              font-size: 1.3em;
+              background-color: #FAFAFA;
+              color: #333;
+              padding: 18px;
+              border-radius: 2px;
+            }
+            details > summary:hover {
+                background-color: #F2F2F2;
+                color: #444;
+            }
+            details[open] > summary::before {
+                transform: rotate(90deg);
+            }
+            summary::before {
+                margin-right: 1ch;
+                display: inline-block;
+                content: '\276F';
+                transition: 0.2s;
+            }
+            summary.sub {
+                font-size: 1em;
+                padding: 3px 3px 3px 18px;
+                background: #fff;
+                font-weight: 500;
+            }
+            ul {
+                list-style-type: none;
+                font-size: 0.9em;
+            }
+            li:nth-child(even) {
+                background-color: #FAFAFA;
+                margin: 12px 0;
+            }
         </style>
     </head>
     <body>
         <h1>Current CVE status for OE-Core/Poky</h1>
-        <ul>
-        <li><a href="cve-status-master.txt">master</a></li>
-        <li><a href="cve-status-nanbield.txt">nanbield</a></li>
-        <li><a href="cve-status-kirkstone.txt">kirkstone</a></li>
-        <li><a href="cve-status-dunfell.txt">dunfell</a></li>
-        </ul>
+        <div class="cve-status">
+            <details>
+                <summary>master</summary>
+                <div id="cve_status_master"></div>
+            </details>
+
+            <details>
+                <summary>nanbield</summary>
+                <div id="cve_status_nanbield"></div>
+            </details>
+            <details>
+                <summary>kirkstone</summary>
+                <div id="cve_status_kirkstone"></div>
+            </details>
+            <details>
+                <summary>dunfell</summary>
+                <div id="cve_status_dunfell"></div>
+            </details>
+        </div>
 
         <h1>CVE Trends for OE-Core/Poky</h1>
         <div id="cve_chart"></div>
@@ -46,6 +107,48 @@ SPDX-License-Identifier: MIT
         </ul>
 
         <script type="text/javascript">
+            fetch('cve-status-master.json')
+            .then(response => response.json())
+            .then(data => {
+                createCVEList('cve_status_master', data);
+            })
+
+            fetch('cve-status-nanbield.json')
+            .then(response => response.json())
+            .then(data => {
+                createCVEList('cve_status_nanbield', data);
+            })
+
+            fetch('cve-status-kirkstone.json')
+            .then(response => response.json())
+            .then(data => {
+                createCVEList('cve_status_kirkstone', data);
+            })
+
+            fetch('cve-status-dunfell.json')
+            .then(response => response.json())
+            .then(data => {
+                createCVEList('cve_status_dunfell', data);
+            })
+
+            function createCVEList(listid, data) {
+                const nestedDetails = document.getElementById(listid);
+                let html = "";
+                for (let [name, info] of Object.entries(data)) {
+                    html += '<details>';
+                    html += `<summary class="sub">${name} (${info.count} CVEs)</summary>`;
+                    html += "<ul>";
+                    for (const cve of info.cves) {
+                        html += '<li>'
+                        html += `<a href="${cve}" target="_blank">${cve}</a>`
+                        html += '</li>';
+                    }
+                    html += "</ul>";
+                    html += "</details>";
+                    nestedDetails.innerHTML = html;
+                };
+            }
+
             var valid_status = ['pending', 'backport', 'inappropriate', 'accepted', 'submitted', 'denied'];
             var label_names = {
                 pending: "Pending",
