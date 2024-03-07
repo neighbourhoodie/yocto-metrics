@@ -13,6 +13,48 @@ SPDX-License-Identifier: MIT
     }
     ul {
       margin-left: 60px;
+      font-size: 0.9em;
+    }
+    details {
+      margin-bottom: 0;
+    }
+    details > ul {
+      margin-left: 0;
+      padding-left: 14px;
+    }
+    details > ul > li {
+      list-style-type: none;
+      font-size: 0.8em;
+    }
+    details > ul > li:nth-child(even) {
+      background-color: #FAFAFA;
+    }
+
+    .cve-status {
+      display: flex;
+      margin: 0 60px;
+      align-items: stretch;
+    }
+    .cve-status > details {
+      flex: 1;
+    }
+    details > summary {
+      background-color: #FAFAFA;
+      padding: 13px 14px;
+    }
+    details[open] > summary {
+      margin-bottom: 6px;
+    }
+    details > summary:hover {
+      background-color: #F2F2F2;
+      color: #444;
+    }
+
+    summary.sub {
+      font-size: 0.8em;
+      padding: 6px 18px;
+      margin-bottom: 6px;
+      background: white;
     }
   </style>
 </head>
@@ -20,12 +62,25 @@ SPDX-License-Identifier: MIT
 <body>
   <main>
     <h3>Current CVE status for OE-Core/Poky</h3>
-    <ul>
-      <li><a href="cve-status-master.txt">master</a></li>
-      <li><a href="cve-status-nanbield.txt">nanbield</a></li>
-      <li><a href="cve-status-kirkstone.txt">kirkstone</a></li>
-      <li><a href="cve-status-dunfell.txt">dunfell</a></li>
-    </ul>
+    <div class="cve-status">
+      <details>
+        <summary>master</summary>
+        <div id="cve_status_master"></div>
+      </details>
+
+      <details>
+        <summary>nanbield</summary>
+        <div id="cve_status_nanbield"></div>
+      </details>
+      <details>
+        <summary>kirkstone</summary>
+        <div id="cve_status_kirkstone"></div>
+      </details>
+      <details>
+        <summary>dunfell</summary>
+        <div id="cve_status_dunfell"></div>
+      </details>
+    </div>
 
     <!-- Prepare a DOM with a defined width and height for ECharts -->
     <section>
@@ -60,6 +115,51 @@ SPDX-License-Identifier: MIT
       <li><a href="releases.csv">releases.csv</a></li>
     </ul>
   </main>
+
+  <script type="text/javascript">
+    fetch('cve-status-master.json')
+   .then(response => response.json())
+   .then(data => {
+       createCVEList('cve_status_master', data);
+   })
+
+   fetch('cve-status-nanbield.json')
+   .then(response => response.json())
+   .then(data => {
+       createCVEList('cve_status_nanbield', data);
+   })
+
+   fetch('cve-status-kirkstone.json')
+   .then(response => response.json())
+   .then(data => {
+       createCVEList('cve_status_kirkstone', data);
+   })
+
+   fetch('cve-status-dunfell.json')
+   .then(response => response.json())
+   .then(data => {
+       createCVEList('cve_status_dunfell', data);
+   })
+
+   function createCVEList(listid, data) {
+       const nestedDetails = document.getElementById(listid);
+       let html = "";
+       for (let [name, info] of Object.entries(data)) {
+           html += '<details>';
+           html += `<summary class="sub">${name} (${info.count} CVEs)</summary>`;
+           html += "<ul>";
+           for (const cve of info.cves) {
+               html += '<li>'
+               html += `<a href="${cve}" target="_blank">${cve}</a>`
+               html += '</li>';
+           }
+           html += "</ul>";
+           html += "</details>";
+           nestedDetails.innerHTML = html;
+       };
+   }
+  </script>
+
   <!-- get the data -->
   <script type="text/javascript">
     const status_names = {
