@@ -13,6 +13,39 @@ SPDX-License-Identifier: MIT
     }
     ul {
       margin-left: 60px;
+      font-size: 0.9em;
+    }
+    details {
+      margin-bottom: 0;
+    }
+    details > ul {
+      margin-left: 0;
+      padding-left: 14px;
+    }
+    details > ul > li {
+      list-style-type: none;
+      font-size: 0.8em;
+    }
+    .cve-status {
+      display: flex;
+      margin: 0 60px;
+      align-items: stretch;
+    }
+    .cve-status > details {
+      flex: 1;
+    }
+    details > summary {
+      padding: 13px 14px;
+    }
+    details > summary:hover {
+      filter: invert(50%);
+    }
+    details[open] > summary {
+      margin-bottom: 6px;
+    }
+    summary.sub {
+      font-size: 0.8em;
+      padding: 6px 18px;
     }
   </style>
 </head>
@@ -20,12 +53,25 @@ SPDX-License-Identifier: MIT
 <body>
   <main>
     <h3>Current CVE status for OE-Core/Poky</h3>
-    <ul>
-      <li><a href="cve-status-master.txt">master</a></li>
-      <li><a href="cve-status-nanbield.txt">nanbield</a></li>
-      <li><a href="cve-status-kirkstone.txt">kirkstone</a></li>
-      <li><a href="cve-status-dunfell.txt">dunfell</a></li>
-    </ul>
+    <div class="cve-status">
+      <details>
+        <summary>master</summary>
+        <div id="cve_status_master"></div>
+      </details>
+
+      <details>
+        <summary>nanbield</summary>
+        <div id="cve_status_nanbield"></div>
+      </details>
+      <details>
+        <summary>kirkstone</summary>
+        <div id="cve_status_kirkstone"></div>
+      </details>
+      <details>
+        <summary>dunfell</summary>
+        <div id="cve_status_dunfell"></div>
+      </details>
+    </div>
 
     <!-- Prepare a DOM with a defined width and height for ECharts -->
     <section>
@@ -60,6 +106,68 @@ SPDX-License-Identifier: MIT
       <li><a href="releases.csv">releases.csv</a></li>
     </ul>
   </main>
+
+  <script type="text/javascript">
+    fetch('cve-status-master.txt')
+   .then(response => response.text())
+   .then(data => {
+      createCVEList('cve_status_master', data);
+   })
+
+   fetch('cve-status-nanbield.txt')
+   .then(response => response.text())
+   .then(data => {
+       createCVEList('cve_status_nanbield', data);
+   })
+
+   fetch('cve-status-kirkstone.txt')
+   .then(response => response.text())
+   .then(data => {
+       createCVEList('cve_status_kirkstone', data);
+   })
+
+   fetch('cve-status-dunfell.txt')
+   .then(response => response.text())
+   .then(data => {
+       createCVEList('cve_status_dunfell', data);
+   })
+
+    function parseTxtFile(data) {
+      const cveData = {}
+      const txtCVEs = data.split(/\n\s*\n/)
+      // skip the header
+      for (let i = 1; i < txtCVEs.length; i++) {
+        const urls = txtCVEs[i].split("\n");
+        packageName = urls[0]
+
+        cveData[packageName] = []
+        for (let i = 1; i < urls.length; i++) {
+          cveData[packageName].push(urls[i].toString().trim());
+        }
+      }
+      return cveData
+    }
+
+    function createCVEList(listid, data) {
+      const nestedDetails = document.getElementById(listid);
+      const cveData = parseTxtFile(data)
+      let html = "";
+      for (let [name, cves] of Object.entries(cveData)) {
+        html += '<details>';
+        html += `<summary class="sub">${name} CVEs</summary>`;
+        html += "<ul>";
+        for (const cve of cves) {
+          html += '<li>'
+          html += `<a href="${cve}" target="_blank">${cve}</a>`
+          html += '</li>';
+        }
+        html += "</ul>";
+        html += "</details>";
+        nestedDetails.innerHTML = html;
+    };
+   }
+  </script>
+
   <!-- get the data -->
   <script type="text/javascript">
     const status_names = {
