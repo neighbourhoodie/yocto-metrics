@@ -1,0 +1,14 @@
+{
+	"backport": 174,
+	"commit": "045eb5913083d34f0854c2e104d7dae3de7634a0",
+	"commit_count": "73853",
+	"date": "1709885176",
+	"denied": 19,
+	"inactive-upstream": 21,
+	"inappropriate": 448,
+	"malformed-sob": 103,
+	"pending": 249,
+	"recipe_count": 921,
+	"submitted": 237,
+	"total": 1148
+}
