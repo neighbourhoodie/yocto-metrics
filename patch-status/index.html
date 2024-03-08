@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="pico.fluid.classless.min.css">
         <style>
             .c3-line {
                 stroke-width: 2px;
@@ -13,6 +14,7 @@ SPDX-License-Identifier: MIT
         </style>
     </head>
     <body>
+      <main>
         <h1>Current CVE status for OE-Core/Poky</h1>
         <ul>
         <li><a href="cve-status-master.txt">master</a></li>
@@ -21,7 +23,6 @@ SPDX-License-Identifier: MIT
         <li><a href="cve-status-dunfell.txt">dunfell</a></li>
         </ul>
 
-        <p><a href="index-full.html">Multi year data</a></p>
 
         <h2>CVE Trends for OE-Core/Poky</h2>
         <div id="cve_chart"></div>
@@ -57,7 +58,7 @@ SPDX-License-Identifier: MIT
             <li><a href="../cve-count-byday-lastyear.json">cve-count-byday-lastyear.json</a></li>
             <li><a href="releases.csv">releases.csv</a></li>
         </ul>
-
+      </main>
         <script type="text/javascript">
             var valid_status = ['pending', 'backport', 'inappropriate', 'accepted', 'submitted', 'denied'];
             var label_names = {
