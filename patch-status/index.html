@@ -1,464 +1,363 @@
-<html>
+<!DOCTYPE html>
 <!--
 SPDX-License-Identifier: MIT
 -->
-    <head>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="pico.fluid.classless.min.css">
-        <style>
-            .c3-line {
-                stroke-width: 2px;
+
+<head>
+  <script src="resources/echarts.min.js"></script>
+  <link rel="stylesheet" href="resources/pico.fluid.classless.min.css">
+  <style>
+    h3 {
+      margin-left: 60px;
+      padding-top: 20px;
+    }
+    ul {
+      margin-left: 60px;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h3>Current CVE status for OE-Core/Poky</h3>
+    <ul>
+      <li><a href="cve-status-master.txt">master</a></li>
+      <li><a href="cve-status-nanbield.txt">nanbield</a></li>
+      <li><a href="cve-status-kirkstone.txt">kirkstone</a></li>
+      <li><a href="cve-status-dunfell.txt">dunfell</a></li>
+    </ul>
+
+    <!-- Prepare a DOM with a defined width and height for ECharts -->
+    <section>
+      <h3>CVE Trends for OE-Core/Poky</h3>
+      <div id='cve_chart' style='height:400px;'></div>
+    </section>
+    <section>
+      <h3>Current Patch Status Pie</h3>
+      <div id='pie_chart' style='height:300px; width: 600px;'></div>
+    </section>
+
+    <section>
+      <h3>Patch Upstream-Status Counts (OE-Core meta directory)</h3>
+      <div id="upstream_status_chart" style="height:400px;"></div>
+    </section>
+
+    <section>
+      <h3>Patch Tag Error Counts (OE-Core meta directory)</h3>
+      <div id="malformed_chart" style="height:400px;"></div>
+    </section>
+
+    <section>
+      <h3>Recipe Count (OE-Core meta directory)</h3>
+      <div id="recipe_chart" style="height:400px;"></div>
+    </section>
+
+    <h3>Raw Data</h3>
+    <ul>
+      <li><a href="patch-status-pie.json">patch-status-pie.json</a></li>
+      <li><a href="patch-status-byday.json">patch-status-byday.json</a></li>
+      <li><a href="../cve-count-byday.json">cve-count-byday.json</a></li>
+      <li><a href="releases.csv">releases.csv</a></li>
+    </ul>
+  </main>
+  <!-- get the data -->
+  <script type="text/javascript">
+    const status_names = {
+      pending: 'Pending',
+      backport: 'Backport',
+      inappropriate: 'Inappropriate',
+      accepted: 'Accepted',
+      submitted: 'Submitted',
+      denied: 'Denied',
+      total: 'Total',
+      sob: 'Malformed Signed-off-by',
+      upstream_status: 'Malformed Upstream-Status'
+    };
+    const branches = ['master', 'nanbield', 'mickledore', 'langdale', 'kirkstone', 'honister', 'hardknott', 'gatesgarth', 'dunfell']
+
+    const generalOptions = {
+      tooltip: {
+        order: 'valueDesc',
+        trigger: 'axis'
+      },
+      legend: {},
+      xAxis : { type: 'time' },
+      yAxis: { type: 'value' },
+      dataZoom: [
+        {
+          type: 'slider',
+          xAxisIndex: 0,
+          filterMode: 'none'
+        },
+        {
+          type: 'slider',
+          yAxisIndex: 0,
+          filterMode: 'none'
+        }
+      ]
+    }
+
+    fetch('releases.csv')
+      .then(response => response.text())
+      .then(data => {
+        const release_lines = []
+        const lines = data.split("\n")
+        // skip the header
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].split(",");
+          if(line.length) {
+            const cve = {
+              name: line[0],
+              xAxis: new Date(line[1])
             }
-        </style>
-    </head>
-    <body>
-      <main>
-        <h1>Current CVE status for OE-Core/Poky</h1>
-        <ul>
-        <li><a href="cve-status-master.txt">master</a></li>
-        <li><a href="cve-status-nanbield.txt">nanbield</a></li>
-        <li><a href="cve-status-kirkstone.txt">kirkstone</a></li>
-        <li><a href="cve-status-dunfell.txt">dunfell</a></li>
-        </ul>
+            release_lines.push(cve)
+          }
+        }
+        const releases = {
+          type: 'line',
+          datasetId: 'releases',
+          markLine: {
+            lineStyle: { color: '#aaa' },
+            symbol: ['none', 'none'],
+            label: {
+              formatter: '{b}',
+              color: '#777'
+            },
+            data: release_lines
+          },
+        }
+        return releases
+      }).then((releases) => {
+        fetch('../cve-count-byday.json')
+          .then(response => response.json())
+          .then(data => {
+            const cve_data = []
+            cve_data.push(['Date', 'Branch', 'Branchvalue']);
+            for (var key in data) {
+              const dateObj = new Date(key * 1000);
+              for (let branchVal in data[key]) {
+                let entry = [dateObj, branchVal, parseInt(data[key][branchVal])]
+                cve_data.push(entry)
+              }
+            }
+            generateCVEChart({ cve_data, releases });
+            return releases;
+          }).then((releases) => {
+        fetch('patch-status-byday.json')
+          .then(response => response.json())
+          .then(data => {
+            // We have to sort the data by date
+            data.sort(function(x, y){
+              return x.date - y.date;
+            })
 
+            const patch_data = data.map(status => {
+              return {
+                date: new Date(status.date * 1000),
+                total: status.total,
+                pending: status.pending || 0,
+                backport: status.backport || 0,
+                inappropriate: status.inappropriate || 0,
+                accepted: status.accepted || 0,
+                submitted: status.submitted || 0,
+                denied: status.denied || 0
+              }
+            })
 
-        <h2>CVE Trends for OE-Core/Poky</h2>
-        <div id="cve_chart"></div>
-        <h3>CVE Trends for OE-Core/Poky of the last year</h3>
-        <div id="cve_chart_lastyear"></div>
+            const malformed_data = data.map(status => {
+              return {
+                date: new Date(status.date * 1000),
+                total: status.total,
+                upstream_status: status['malformed-upstream-status'] || 0,
+                sob: status['malformed-sob'] || 0
+              }
+            })
 
-        <h2>Current Patch Status Pie</h2>
-        <div id="status_pie_chart"></div>
+            const recipe_data = data.map(status => {
+              return {
+                date: new Date(status.date * 1000),
+                recipe_count: status.recipe_count
+              }
+            })
 
-        <h2>Patch Upstream-Status Counts (OE-Core meta directory)</h2>
-        <div id="upstream_status_chart"></div>
-        <h3>Patch Upstream-Status Counts (OE-Core meta directory) from the last year</h3>
-        <div id="upstream_status_chart_lastyear"></div>
+            generateMalformedChart({ malformed_data, releases });
+            generateUpstreamChart({ patch_data, releases });
+            generateRecipeChart({ recipe_data, releases });
+          });
+        });
+      });
+  </script>
 
-        <h2>Patch Tag Error Counts (OE-Core meta directory)</h2>
-        <div id="malformed_chart"></div>
-        <h3>Patch Tag Error Counts (OE-Core meta directory) from the last year</h3>
-        <div id="malformed_chart_lastyear"></div>
+  <!-- cve_chart -->
+  <script type="text/javascript">
+  var cveChart = echarts.init(document.getElementById('cve_chart'));
 
-        <h2>Recipe Count (OE-Core meta directory)</h2>
-        <div id="recipe_count_chart"></div>
-        <h3>Recipe Count (OE-Core meta directory) from the last year</h3>
-        <div id="recipe_count_chart_lastyear"></div>
+  const cveSeries = []
+  const datasetWithFilters = []
+  function generateCVEChart({ cve_data, releases }) {
+    branches.forEach(branch => {
+      datasetWithFilters.push({
+        id: branch,
+        fromDatasetId: 'dataset_raw',
+        transform: {
+          type: 'filter',
+          config: {
+            dimension: 'Branch', '=': branch,
+          }
+        }
+      });
+      cveSeries.push({
+        type: 'line',
+        showSymbol: false,
+        datasetId: branch,
+        name: branch,
+        encode: {
+          x: 'Date',
+          y: 'Branchvalue'
+        }
+      });
+    });
+    const cveOption = {
+      legend: { right: 'auto' },
+      ...generalOptions,
+      dataset: [
+        {
+          id: 'dataset_raw',
+          source: cve_data
+        },
+        ...datasetWithFilters
+      ],
+      series: [
+        releases,
+        ...cveSeries,
+      ]
+    };
 
-        <h3>Raw Data</h3>
-        <ul>
-            <li><a href="../patch-status.json">patch-status.json</a></li>
-            <li><a href="patch-status-pie.json">patch-status-pie.json</a></li>
+    cveChart.setOption(cveOption);
+  }
+  </script>
 
-            <li><a href="patch-status-byday.json">patch-status-byday.json</a></li>
-            <li><a href="patch-status-byday-lastyear.json">patch-status-byday-lastyear.json</a></li>
-            <li><a href="../cve-count-byday.json">cve-count-byday.json</a></li>
-            <li><a href="../cve-count-byday-lastyear.json">cve-count-byday-lastyear.json</a></li>
-            <li><a href="releases.csv">releases.csv</a></li>
-        </ul>
-      </main>
-        <script type="text/javascript">
-            var valid_status = ['pending', 'backport', 'inappropriate', 'accepted', 'submitted', 'denied'];
-            var label_names = {
-                pending: "Pending",
-                backport: "Backport",
-                inappropriate: "Inappropriate",
-                accepted: "Accepted",
-                submitted: "Submitted",
-                denied: "Denied",
-                total: "Total",
-                'malformed-sob': "Malformed Signed-off-by",
-                'malformed-upstream-status': "Malformed Upstream-Status"
-            };
+  <!-- pie chart -->
+  <script>
+    var pieChart = echarts.init(document.getElementById('pie_chart'));
 
-            d3.json("patch-status-pie.json").then(function(data) {
-                var chart = c3.generate({
-                    bindto: '#status_pie_chart',
-                    data: {
-                        json: [data],
-                        keys: {
-                            value: valid_status
-                        },
-                        type: "pie",
-                        names: label_names
-                    },
-                    pie: {
-                        label: {
-                            format: function (value, ratio, id) {
-                                return d3.format('.0%')(ratio);
-                            }
-                        }
-                    }
-                });
-            });
+    fetch('patch-status-pie.json')
+      .then(response => response.json())
+      .then(data => {
+        const formatted = [
+          { "value": data.pending || 0, "name": "Pending" },
+          { "value": data.backport || 0, "name": "Backport" },
+          { "value": data.inappropriate || 0, "name": "Inappropriate" },
+          { "value": data.accepted || 0, "name": "Accepted" },
+          { "value": data.submitted || 0, "name": "Submitted" },
+          { "value": data.denied || 0, "name": "Denied" }
+        ]
+        generatePieChart(formatted)
+      });
 
-            // #cve_chart
-            d3.dsv(",", "releases.csv", function(d) {
-                return {
-                    value: new Date(d.Date),
-                    text: d.Name
-                };
-            }).then(function(release_lines) {
-                d3.json("cve-count-byday-lastyear.json").then(function(cve_data) {
-                    cve_data2 = []
-                    for (var key in cve_data) {
-                        cve_data[key].date = key
-                        cve_data2.push(cve_data[key])
-                    }
+    function generatePieChart(data) {
+      const pieOption = {
+        tooltip: { trigger: 'item' },
+        series: [{
+          type: 'pie',
+          radius: '50%',
+          data: data,
+          label: { formatter: '{b} {d}%' },
+        }],
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      };
+      pieChart.setOption(pieOption);
+    }
+  </script>
 
-                    var chart = c3.generate({
-                        bindto: '#cve_chart',
-                        data: {
-                            json: cve_data2,
-                            xFormat: "%s",
-                            keys: {
-                                x: "date",
-                                value: ['master', 'nanbield', 'mickledore', 'langdale', 'kirkstone', 'honister', 'hardknott', 'gatesgarth', 'dunfell']
-                            },
-                            type: "line",
-                            names: label_names
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                },
-                                localtime: false
-                            },
-                            y: {
-                                min: 0,
-                                padding: {bottom:0}
-                            }
-                        },
-                        grid: {
-                            x: {
-                                lines: release_lines
-                            },
-                            y: {
-                                show: true
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        line: {
-                            connectNull: true
-                        },
-                        point: {
-                            show: false
-                        }
-                    });
+  <!-- patch status -->
+  <script type="text/javascript">
+    var upstreamStatusChart = echarts.init(document.getElementById('upstream_status_chart'));
 
-                });
+    function generateUpstreamChart({ patch_data, releases }) {
+      releases.markLine.label.position = 'insideEndTop';
+      const keys = Object.keys(patch_data[0]);
+      const upstreamSeries = keys
+        .filter(status => status !== 'date')
+        .map(status => ({
+          type: 'line',
+          showSymbol: false,
+          areaStyle: {},
+          name: status_names[status],
+          encode: { x: 'Date', y: status }
+        }));
 
-            });
-            // #cve_chart lastyear
-            d3.dsv(",", "releases.csv", function(d) {
-                return {
-                    value: new Date(d.Date),
-                    text: d.Name
-                };
-            }).then(function(release_lines) {
-                d3.json("../cve-count-byday_lastyear.json")
-                .then(function(cve_data) {
-                    cve_data2 = []
-                    for (var key in cve_data) {
-                        cve_data[key].date = key
-                        cve_data2.push(cve_data[key])
-                    }
+      const upstreamOption = {
+        ...generalOptions,
+        dataset: { source: patch_data },
+        series: [
+          releases,
+          ...upstreamSeries
+        ]
+      };
 
-                    var chart = bb.generate({
-                        bindto: '#cve_chart_lastyear',
-                        data: {
-                            json: cve_data2,
-                            xFormat: "%s",
-                            keys: {
-                                x: "date",
-                                value: ['master', 'nanbield', 'mickledore', 'langdale', 'kirkstone', 'honister', 'hardknott', 'gatesgarth', 'dunfell']
-                            },
-                            type: "line",
-                            names: label_names
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                },
-                                localtime: false
-                            },
-                            y: {
-                                min: 0,
-                                padding: {bottom:0}
-                            }
-                        },
-                        grid: {
-                            x: {
-                                lines: release_lines
-                            },
-                            y: {
-                                show: true
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        line: {
-                            connectNull: true
-                        },
-                        point: {
-                            show: false
-                        }
-                    });
+      upstreamStatusChart.setOption(upstreamOption);
+    }
+  </script>
 
-                });
+  <!-- malformed upstream -->
+  <script type="text/javascript">
+    var malformedChart = echarts.init(document.getElementById('malformed_chart'));
 
-            });
+    function generateMalformedChart({ malformed_data, releases }) {
+      releases.markLine.label.position = 'insideEndTop';
+      const keys = Object.keys(malformed_data[0]);
+      const malformedSeries = keys
+        .filter(status => status !== 'date')
+        .map(status => ({
+          type: 'line',
+          showSymbol: false,
+          areaStyle: {},
+          name: status_names[status],
+          encode: { x: 'Date', y: status }
+        }));
 
-            d3.dsv(",", "releases.csv", function(d) {
-                return {
-                    value: new Date(d.Date),
-                    text: d.Name
-                };
-            }).then(function(release_lines) {
-                d3.json("patch-status-byday-lastyear.json").then(function(status_data) {
-                    var chart = c3.generate({
-                        bindto: '#upstream_status_chart',
-                        data: {
-                            json: status_data,
-                            xFormat: "%s",
-                            keys: {
-                                x: "date",
-                                value: valid_status.concat(['total'])
-                            },
-                            type: "area",
-                            groups: [valid_status, ['total']],
-                            names: label_names
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                },
-                                localtime: false
-                            }
-                        },
-                        grid: {
-                            x: {
-                                lines: release_lines
-                            },
-                            y: {
-                                show: true
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        point: {
-                            show: false
-                        }
-                    });
+      const malformedOption = {
+        ...generalOptions,
+        legend: {},
+        dataset: { source: malformed_data },
+        series: [
+          releases,
+          ...malformedSeries
+        ]
+      };
 
-                    var chart = c3.generate({
-                        bindto: '#malformed_chart',
-                        data: {
-                            json: status_data,
-                            xFormat: "%s",
-                            keys: {
-                                x: "date",
-                                value: ['total', 'malformed-upstream-status', 'malformed-sob']
-                            },
-                            type: "area",
-                            names: label_names
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                },
-                                localtime: false
-                            }
-                        },
-                        grid: {
-                            x: {
-                                lines: release_lines
-                            },
-                            y: {
-                                show: true
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        point: {
-                            show: false
-                        }
-                    });
-                    var chart = c3.generate({
-                        bindto: '#recipe_count_chart',
-                        data: {
-                            json: status_data,
-                            xFormat: "%s",
-                            keys: {
-                                x: "date",
-                                value: ['recipe_count']
-                            },
-                            type: "area",
-                            names: label_names
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                },
-                                localtime: false
-                            }
-                        },
-                        grid: {
-                            x: {
-                                lines: release_lines
-                            },
-                            y: {
-                                show: true
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        point: {
-                            show: false
-                        }
-                    });
+      malformedChart.setOption(malformedOption);
+    }
+  </script>
 
-                });
-            });
+  <!-- recipe count -->
+  <script type="text/javascript">
+    var recipeChart = echarts.init(document.getElementById('recipe_chart'));
 
-            d3.dsv(",", "releases.csv", function(d) {
-                return {
-                    value: new Date(d.Date),
-                    text: d.Name
-                };
-            }).then(function(release_lines) {
-                d3.json("patch-status-byday_lastyear.json").then(function(status_data) {
-                    var chart = bb.generate({
-                        bindto: '#upstream_status_chart_lastyear',
-                        data: {
-                            json: status_data,
-                            xFormat: "%s",
-                            keys: {
-                                x: "date",
-                                value: valid_status.concat(['total'])
-                            },
-                            type: "area",
-                            groups: [valid_status, ['total']],
-                            names: label_names
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                },
-                                localtime: false
-                            }
-                        },
-                        grid: {
-                            x: {
-                                lines: release_lines
-                            },
-                            y: {
-                                show: true
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        point: {
-                            show: false
-                        }
-                    });
+    function generateRecipeChart({ recipe_data, releases }) {
+      releases.markLine.label.position = 'insideEndTop';
 
-                    var chart = bb.generate({
-                        bindto: '#malformed_chart_last',
-                        data: {
-                            json: status_data,
-                            xFormat: "%s",
-                            keys: {
-                                x: "date",
-                                value: ['total', 'malformed-upstream-status', 'malformed-sob']
-                            },
-                            type: "area",
-                            names: label_names
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                },
-                                localtime: false
-                            }
-                        },
-                        grid: {
-                            x: {
-                                lines: release_lines
-                            },
-                            y: {
-                                show: true
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        point: {
-                            show: false
-                        }
-                    });
-                    var chart = bb.generate({
-                        bindto: '#recipe_count_chart_lastyear',
-                        data: {
-                            json: status_data,
-                            xFormat: "%s",
-                            keys: {
-                                x: "date",
-                                value: ['recipe_count']
-                            },
-                            type: "area",
-                            names: label_names
-                        },
-                        axis: {
-                            x: {
-                                type: 'timeseries',
-                                tick: {
-                                    format: '%Y-%m-%d'
-                                },
-                                localtime: false
-                            }
-                        },
-                        grid: {
-                            x: {
-                                lines: release_lines
-                            },
-                            y: {
-                                show: true
-                            }
-                        },
-                        zoom: {
-                            enabled: true
-                        },
-                        point: {
-                            show: false
-                        }
-                    });
+      const recipeOption = {
+        ...generalOptions,
+        dataset: { source: recipe_data },
+        series: [
+          releases,
+          {
+            type: 'line',
+            showSymbol: false,
+            name: 'Recipe Count',
+            areaStyle: {},
+          }
+        ]
+      };
 
-                });
-            });
-        </script>
-    </body>
-</html>
+      recipeChart.setOption(recipeOption);
+    }
+  </script>
