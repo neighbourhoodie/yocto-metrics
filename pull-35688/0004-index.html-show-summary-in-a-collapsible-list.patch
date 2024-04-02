@@ -1,0 +1,152 @@
+From b8bb5dfd3040a91e65e98d9b5e41a167f73e5eac Mon Sep 17 00:00:00 2001
+Message-ID: <b8bb5dfd3040a91e65e98d9b5e41a167f73e5eac.1712069088.git.13760198+ninetteadhikari@users.noreply.github.com>
+In-Reply-To: <cover.1712069088.git.13760198+ninetteadhikari@users.noreply.github.com>
+References: <cover.1712069088.git.13760198+ninetteadhikari@users.noreply.github.com>
+From: hulkoba <jacoba@neighbourhood.ie>
+Date: Thu, 7 Mar 2024 06:10:41 +0100
+Subject: [PATCH 4/4] index.html: show summary in a collapsible list
+
+---
+ patch-status/index.html | 112 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 106 insertions(+), 6 deletions(-)
+
+diff --git a/patch-status/index.html b/patch-status/index.html
+index e72353a2..abf9931f 100644
+--- a/patch-status/index.html
++++ b/patch-status/index.html
+@@ -13,6 +13,48 @@ SPDX-License-Identifier: MIT
+     }
+     ul {
+       margin-left: 60px;
++      font-size: 0.9em;
++    }
++    details {
++      margin-bottom: 0;
++    }
++    details > ul {
++      margin-left: 0;
++      padding-left: 14px;
++    }
++    details > ul > li {
++      list-style-type: none;
++      font-size: 0.8em;
++    }
++    details > ul > li:nth-child(even) {
++      background-color: #FAFAFA;
++    }
++
++    .cve-status {
++      display: flex;
++      margin: 0 60px;
++      align-items: stretch;
++    }
++    .cve-status > details {
++      flex: 1;
++    }
++    details > summary {
++      background-color: #FAFAFA;
++      padding: 13px 14px;
++    }
++    details[open] > summary {
++      margin-bottom: 6px;
++    }
++    details > summary:hover {
++      background-color: #F2F2F2;
++      color: #444;
++    }
++
++    summary.sub {
++      font-size: 0.8em;
++      padding: 6px 18px;
++      margin-bottom: 6px;
++      background: white;
+     }
+   </style>
+ </head>
+@@ -20,12 +62,25 @@ SPDX-License-Identifier: MIT
+ <body>
+   <main>
+     <h3>Current CVE status for OE-Core/Poky</h3>
+-    <ul>
+-      <li><a href="cve-status-master.txt">master</a></li>
+-      <li><a href="cve-status-nanbield.txt">nanbield</a></li>
+-      <li><a href="cve-status-kirkstone.txt">kirkstone</a></li>
+-      <li><a href="cve-status-dunfell.txt">dunfell</a></li>
+-    </ul>
++    <div class="cve-status">
++      <details>
++        <summary>master</summary>
++        <div id="cve_status_master"></div>
++      </details>
++
++      <details>
++        <summary>nanbield</summary>
++        <div id="cve_status_nanbield"></div>
++      </details>
++      <details>
++        <summary>kirkstone</summary>
++        <div id="cve_status_kirkstone"></div>
++      </details>
++      <details>
++        <summary>dunfell</summary>
++        <div id="cve_status_dunfell"></div>
++      </details>
++    </div>
+ 
+     <!-- Prepare a DOM with a defined width and height for ECharts -->
+     <section>
+@@ -60,6 +115,51 @@ SPDX-License-Identifier: MIT
+       <li><a href="releases.csv">releases.csv</a></li>
+     </ul>
+   </main>
++
++  <script type="text/javascript">
++    fetch('cve-status-master.json')
++   .then(response => response.json())
++   .then(data => {
++       createCVEList('cve_status_master', data);
++   })
++
++   fetch('cve-status-nanbield.json')
++   .then(response => response.json())
++   .then(data => {
++       createCVEList('cve_status_nanbield', data);
++   })
++
++   fetch('cve-status-kirkstone.json')
++   .then(response => response.json())
++   .then(data => {
++       createCVEList('cve_status_kirkstone', data);
++   })
++
++   fetch('cve-status-dunfell.json')
++   .then(response => response.json())
++   .then(data => {
++       createCVEList('cve_status_dunfell', data);
++   })
++
++   function createCVEList(listid, data) {
++       const nestedDetails = document.getElementById(listid);
++       let html = "";
++       for (let [name, info] of Object.entries(data)) {
++           html += '<details>';
++           html += `<summary class="sub">${name} (${info.count} CVEs)</summary>`;
++           html += "<ul>";
++           for (const cve of info.cves) {
++               html += '<li>'
++               html += `<a href="${cve}" target="_blank">${cve}</a>`
++               html += '</li>';
++           }
++           html += "</ul>";
++           html += "</details>";
++           nestedDetails.innerHTML = html;
++       };
++   }
++  </script>
++
+   <!-- get the data -->
+   <script type="text/javascript">
+     const status_names = {
+-- 
+2.44.0
+

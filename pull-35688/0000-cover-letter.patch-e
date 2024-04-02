@@ -1,0 +1,26 @@
+From b8bb5dfd3040a91e65e98d9b5e41a167f73e5eac Mon Sep 17 00:00:00 2001
+Message-ID: <cover.1712069088.git.13760198+ninetteadhikari@users.noreply.github.com>
+From: Ninette Adhikari <13760198+ninetteadhikari@users.noreply.github.com>
+Date: Tue, 2 Apr 2024 16:44:48 +0200
+Subject: [PATCH 0/4] *** SUBJECT HERE ***
+
+*** BLURB HERE ***
+
+hulkoba (4):
+  patch-status: merge index- and index-full.html
+  patch-status/index.html: use pico.css
+  patch-status/index.html: use echarts to display all charts
+  index.html: show summary in a collapsible list
+
+ patch-status/index-full.html                  | 266 -------
+ patch-status/index.html                       | 723 +++++++++++-------
+ patch-status/resources/echarts.min.js         |   1 +
+ .../resources/pico.fluid.classless.min.css    |   4 +
+ 4 files changed, 464 insertions(+), 530 deletions(-)
+ delete mode 100644 patch-status/index-full.html
+ create mode 100644 patch-status/resources/echarts.min.js
+ create mode 100644 patch-status/resources/pico.fluid.classless.min.css
+
+-- 
+2.44.0
+
