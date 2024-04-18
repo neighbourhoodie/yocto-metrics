@@ -1,0 +1,47 @@
+From 713363d10130ae63a214d3284a0f338ab7f985fd Mon Sep 17 00:00:00 2001
+From: hulkoba <jacoba@neighbourhood.ie>
+Date: Thu, 18 Apr 2024 10:26:00 +0200
+Subject: [PATCH 0/4] M11: Unify metrics views and M10: Metrics view: CVEs per
+ branch section
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Yocto currently maintains two views to display metrics: a multi-year and a single-year view.
+Unifying them facilitates a more seamless user experience, and improves the maintenance of the website.
+Yocto gathers the amount of CVEs per branch at the top of their metrics view.
+However, the presentation of this information is not descriptive enough and it’s spread across several files.
+This change adds collapsible, nested lists to show all cve information.
+
+Technical details:
+- Remove index-full.hmtl and only load the complete set of data
+- Use pico.css to improve UX
+- Use echarts and add a separate controls section (zoom) for this purpose and remove interactivity from the old charts themselves
+- Load releases.csv only once
+- Show current CVE count per release, parse txt files with CVE lists to group them by project and display their total CVE count.
+  Inline this data on the page in details elements so there’s no need to navigate away.
+- Handle dark mode
+
+Note that there will be another patch for the autobuilder-helper project where we update the data that is used.
+
+Please also note that there will be another milestone for improving the charts.
+It will improve performance, add descriptions and improve developer documentation.
+
+hulkoba (4):
+  patch-status: merge index- and index-full.html
+  patch-status/index.html: use pico.css
+  patch-status/index.html: use echarts to display all charts
+  index.html: show summary in a collapsible list
+
+ patch-status/index-full.html                  | 266 ------
+ patch-status/index.html                       | 754 ++++++++++++------
+ patch-status/resources/echarts.min.js         |   1 +
+ .../resources/pico.fluid.classless.min.css    |   4 +
+ 4 files changed, 495 insertions(+), 530 deletions(-)
+ delete mode 100644 patch-status/index-full.html
+ create mode 100644 patch-status/resources/echarts.min.js
+ create mode 100644 patch-status/resources/pico.fluid.classless.min.css
+
+-- 
+2.34.1
+
