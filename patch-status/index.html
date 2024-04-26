@@ -102,7 +102,7 @@ SPDX-License-Identifier: MIT
     <ul>
       <li><a href="patch-status-pie.json">patch-status-pie.json</a></li>
       <li><a href="patch-status-byday.json">patch-status-byday.json</a></li>
-      <li><a href="../cve-count-byday.json">cve-count-byday.json</a></li>
+      <li><a href="cve-count-byday.json">cve-count-byday.json</a></li>
       <li><a href="releases.csv">releases.csv</a></li>
     </ul>
   </main>
@@ -236,7 +236,7 @@ SPDX-License-Identifier: MIT
         }
         return releases
       }).then((releases) => {
-        fetch('../cve-count-byday.json')
+        fetch('cve-count-byday.json')
           .then(response => response.json())
           .then(data => {
             const cve_data = []
