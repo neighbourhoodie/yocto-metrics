@@ -58,7 +58,10 @@ SPDX-License-Identifier: MIT
         <summary>master</summary>
         <div id="cve_status_master"></div>
       </details>
-
+      <details>
+        <summary>scarthgap</summary>
+        <div id="cve_status_scarthgap"></div>
+      </details>
       <details>
         <summary>nanbield</summary>
         <div id="cve_status_nanbield"></div>
@@ -112,6 +115,12 @@ SPDX-License-Identifier: MIT
    .then(response => response.text())
    .then(data => {
       createCVEList('cve_status_master', data);
+   })
+
+   fetch('cve-status-scarthgap.txt')
+   .then(response => response.text())
+   .then(data => {
+       createCVEList('cve_status_scarthgap', data);
    })
 
    fetch('cve-status-nanbield.txt')
@@ -181,7 +190,7 @@ SPDX-License-Identifier: MIT
       sob: 'Malformed Signed-off-by',
       upstream_status: 'Malformed Upstream-Status'
     };
-    const branches = ['master', 'nanbield', 'mickledore', 'langdale', 'kirkstone', 'honister', 'hardknott', 'gatesgarth', 'dunfell']
+    const branches = ['master', 'scarthgap', 'nanbield', 'mickledore', 'langdale', 'kirkstone', 'honister', 'hardknott', 'gatesgarth', 'dunfell']
 
     const general_options = {
       tooltip: {
