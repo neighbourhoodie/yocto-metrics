@@ -1,0 +1,4 @@
+# ignore generated data files
+patch-status/cve-count-byday.json
+patch-status/cve-status-*.txt
+patch-status/patch-status-*.json
