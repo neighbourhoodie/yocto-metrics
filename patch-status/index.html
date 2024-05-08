@@ -332,17 +332,20 @@ SPDX-License-Identifier: MIT
     <div id="malformed_chart" style="height:400px;"></div>
 
     <section>
-      <h3>Recipe Count (OE-Core meta directory)</h3>
-      <div id="recipe_chart" style="height:400px;"></div>
+      <h2>Recipe Count (OE-Core meta directory)</h2>
+      <p>
+        This graph displays the number of recipes. It provides insights into the growth and evolution of the OE-Core meta directory by tracking the number of recipes over time.</p>
+      <p>
+        A recipe in the context of Yocto and the OE-Core meta directory refers to a set of instructions or metadata files that describe how to build a particular software package. These recipes typically include information about where to obtain the source code, how to configure it, and how to build and install it into the target system.</p>
+      <p>
+        <em>An increasing recipe count indicates the addition of new software packages or updates to existing ones. It reflects the growth of the OE-Core meta directory over time.
+          A higher recipe count often means better software coverage, allowing users to build a wider range of software packages for their embedded systems.
+          With more recipes, there’s increased maintenance effort to ensure that recipes are up-to-date, correctly configured, and build without errors.</em>
+      </p>
     </section>
 
-    <h3>Raw Data</h3>
-    <ul>
-      <li><a href="patch-status-pie.json">patch-status-pie.json</a></li>
-      <li><a href="patch-status-byday.json">patch-status-byday.json</a></li>
-      <li><a href="cve-count-byday.json">cve-count-byday.json</a></li>
-      <li><a href="releases.csv">releases.csv</a></li>
-    </ul>
+    <div id="recipe_chart" style="height:400px;"></div>
+
   </main>
 
   <script type="text/javascript">
