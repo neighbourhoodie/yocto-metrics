@@ -1,0 +1,50 @@
+From 3f782a389f5a611358065a158e79610bcffa97eb Mon Sep 17 00:00:00 2001
+From: Alex Feyerke <hello@alexfeyerke.com>
+Date: Wed, 8 May 2024 10:46:21 +0200
+Subject: [PATCH 06/12] index.html: Add description to patch status metric pie
+ chart
+
+Signed-off-by: Alex Feyerke <hello@alexfeyerke.com>
+---
+ patch-status/index.html | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/patch-status/index.html b/patch-status/index.html
+index 09299910..30f1cef0 100644
+--- a/patch-status/index.html
++++ b/patch-status/index.html
+@@ -29,6 +29,11 @@ SPDX-License-Identifier: MIT
+     h2 {
+       padding-top: 1em;
+     }
++
++    .flex {
++      display: flex;
++    }
++
+     details {
+       margin-bottom: 0;
+     }
+@@ -173,8 +178,17 @@ SPDX-License-Identifier: MIT
+     <div id='cve_chart' style='height:400px;'></div>
+ 
+     <section>
+-      <h3>Current Patch Status Pie</h3>
+-      <div id='pie_chart' style='height:300px; width: 600px;'></div>
++      <h2>Current Patch Status Metrics</h2>
++      <div class="flex">
++        <div id='pie_chart' style='height:300px; width: 600px;'></div>
++        <div>
++          <p>
++            This graph shows the latest patch breakdown metrics.</p>
++          <p>
++            <strong>Hover over a section</strong> to see the amount of patches with each status.
++          </p>
++        </div>
++      </div>
+     </section>
+ 
+     <section>
+-- 
+2.39.3 (Apple Git-145)
+

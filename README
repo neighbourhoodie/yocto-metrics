@@ -1,0 +1,64 @@
+# yocto-metrics
+Yocto Project autobuilder gathered metrics, CVEs etc.
+
+## Local setup
+1. Clone repositories
+
+  Clone both the report and data repo:
+
+  ```sh
+  # clone yocto-autobuilder-helper
+  git clone git://git.yoctoproject.org/yocto-autobuilder-helper.git
+
+  # clone yocto-metrics
+  git clone git://git.yoctoproject.org/yocto-metrics
+  ```
+
+2. Generate chart data
+  At first we have to generate the necessary data for the charts.
+  For this we have to go the autobuilder repository and generate chart data.
+
+  Go to your local clone of the autobuilder repository
+  Then run the following to generate the data and save it in your local yocto-metrics/patch-status directory:
+
+  _Possibly you have to adapt your local path to yocto-metrics._
+  ```sh
+  cd yocto-autobuilder-helper
+  ./scripts/patchmetrics-generate-chartdata --json "../yocto-metrics/patch-status.json" --outputdir "../yocto-metrics/patch-status/"
+  ```
+
+3. Generate CVE report data
+  We need to generate CVE report data for each branch.
+  The following is an example showing data generated for the master branch.
+  You will need to run this for _every branch you need CVE data_ for.
+
+  📣 Replace master for other relevant branch names and 1709622082 for respective json file names.
+  The branch names and data are listed at the `yocto-metrics/cve-check` directory.
+
+  ```sh
+  ./scripts/cve-report.py "../yocto-metrics/cve-check/master/<TIMESTAMP>.json" > "../yocto-metrics/patch-status/cve-status-master.txt"
+  ```
+
+4. Copy cve-count-byday.json
+  This file is located where the index.html cannot find it. Adapting the path, breakes the live environment.
+  So we copy it to the `patch-status` folder:
+  ```sh
+  # Go to your local clone of the yocto-metrics repo
+  cd yocto-metrics
+
+  cp cve-count-byday.json patch-status/cve-count-byday.json
+  ```
+
+5. View charts
+  Once the chart data is created you can run the index.html file in the yocto-metrics repository as follows:
+
+  ```sh
+  # open the chart html file in your browser
+  open ./patch-status/index.html
+  ```
+
+  **Note:** If the index.html throws a CORS error you can run the file through the Python SimpleHTTPServer, for example with:
+
+  ```
+  python3 -m http.server
+  ```

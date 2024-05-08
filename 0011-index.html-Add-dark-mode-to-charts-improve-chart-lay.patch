@@ -1,0 +1,237 @@
+From 3fb521363a090e0cefeb1f2a923dffb8f52c923e Mon Sep 17 00:00:00 2001
+From: Alex Feyerke <hello@alexfeyerke.com>
+Date: Wed, 8 May 2024 11:05:11 +0200
+Subject: [PATCH 11/12] index.html: Add dark mode to charts, improve chart
+ layout
+
+Improve dark mode to include charts. Also make line and area charts full width and remove animations.
+
+Signed-off-by: Alex Feyerke <hello@alexfeyerke.com>
+---
+ patch-status/index.html        | 56 +++++++++++--------------
+ patch-status/resources/dark.js | 76 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+), 31 deletions(-)
+ create mode 100644 patch-status/resources/dark.js
+
+diff --git a/patch-status/index.html b/patch-status/index.html
+index a847a456..86e8c9db 100644
+--- a/patch-status/index.html
++++ b/patch-status/index.html
+@@ -8,6 +8,8 @@ SPDX-License-Identifier: MIT
+   <meta charset="UTF-8">
+   <meta title="Yocto Autobuilder Patch Metrics" <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <script src="resources/echarts.min.js"></script>
++  <!-- import dark theme -->
++  <script src="resources/dark.js"></script>
+   <link rel="stylesheet" href="resources/pico.fluid.classless.min.css">
+   <link rel="apple-touch-icon" sizes="144x144" href="/resources/apple-touch-icon.png">
+   <link rel="icon" type="image/png" sizes="32x32" href="/resources/favicon-32x32.png">
+@@ -426,6 +428,7 @@ SPDX-License-Identifier: MIT
+ 
+   <!-- get the data -->
+   <script type="text/javascript">
++    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default'
+     const status_names = {
+       pending: 'Pending',
+       backport: 'Backport',
+@@ -554,11 +557,16 @@ SPDX-License-Identifier: MIT
+ 
+   <!-- cve_chart -->
+   <script type="text/javascript">
+-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+-    // dark mode
+-    var cveChart = echarts.init(document.getElementById('cve_chart'), 'dark');
+-  } else {
+-    var cveChart = echarts.init(document.getElementById('cve_chart'));
++  const cveChart = echarts.init(document.getElementById('cve_chart'), theme);
++
++  const optionsforAllLineCharts = {
++    grid: {
++      left: 60,
++      right: 60,
++      top: 75,
++      bottom: 90
++    },
++    animation: false
+   }
+ 
+   const cveSeries = []
+@@ -599,7 +607,8 @@ SPDX-License-Identifier: MIT
+       series: [
+         releases,
+         ...cveSeries,
+-      ]
++      ],
++      ...optionsforAllLineCharts
+     };
+ 
+     cveChart.setOption(cveOption);
+@@ -608,12 +617,7 @@ SPDX-License-Identifier: MIT
+ 
+   <!-- pie chart -->
+   <script>
+-    // dark mode
+-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+-      var pieChart = echarts.init(document.getElementById('pie_chart'), 'dark');
+-    } else {
+-      var pieChart = echarts.init(document.getElementById('pie_chart'));
+-    }
++    const pieChart = echarts.init(document.getElementById('pie_chart'), theme);
+ 
+     fetch('patch-status-pie.json')
+       .then(response => response.json())
+@@ -652,12 +656,7 @@ SPDX-License-Identifier: MIT
+ 
+   <!-- patch status -->
+   <script type="text/javascript">
+-    // dark mode
+-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+-      var upstreamStatusChart = echarts.init(document.getElementById('upstream_status_chart'), 'dark');
+-    } else {
+-      var upstreamStatusChart = echarts.init(document.getElementById('upstream_status_chart'));
+-    }
++    const upstreamStatusChart = echarts.init(document.getElementById('upstream_status_chart'), theme);
+ 
+     function generateUpstreamChart({ patch_data, releases }) {
+       releases.markLine.label.position = 'insideEndTop';
+@@ -678,7 +677,8 @@ SPDX-License-Identifier: MIT
+         series: [
+           releases,
+           ...upstreamSeries
+-        ]
++        ],
++        ...optionsforAllLineCharts
+       };
+ 
+       upstreamStatusChart.setOption(upstreamOption);
+@@ -687,11 +687,7 @@ SPDX-License-Identifier: MIT
+ 
+   <!-- malformed upstream -->
+   <script type="text/javascript">
+-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+-      var malformedChart = echarts.init(document.getElementById('malformed_chart'), 'dark');
+-    } else {
+-      var malformedChart = echarts.init(document.getElementById('malformed_chart'));
+-    }
++    const malformedChart = echarts.init(document.getElementById('malformed_chart'), theme);
+ 
+     function generateMalformedChart({ malformed_data, releases }) {
+       releases.markLine.label.position = 'insideEndTop';
+@@ -713,7 +709,8 @@ SPDX-License-Identifier: MIT
+         series: [
+           releases,
+           ...malformedSeries
+-        ]
++        ],
++        ...optionsforAllLineCharts
+       };
+ 
+       malformedChart.setOption(malformedOption);
+@@ -722,11 +719,7 @@ SPDX-License-Identifier: MIT
+ 
+   <!-- recipe count -->
+   <script type="text/javascript">
+-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+-      var recipeChart = echarts.init(document.getElementById('recipe_chart'), 'dark');
+-    } else {
+-      var recipeChart = echarts.init(document.getElementById('recipe_chart'));
+-    }
++    const recipeChart = echarts.init(document.getElementById('recipe_chart'), theme);
+ 
+     function generateRecipeChart({ recipe_data, releases }) {
+       releases.markLine.label.position = 'insideEndTop';
+@@ -742,7 +735,8 @@ SPDX-License-Identifier: MIT
+             name: 'Recipe Count',
+             areaStyle: {},
+           }
+-        ]
++        ],
++        ...optionsforAllLineCharts
+       };
+ 
+       recipeChart.setOption(recipeOption);
+diff --git a/patch-status/resources/dark.js b/patch-status/resources/dark.js
+new file mode 100644
+index 00000000..7f0fc92c
+--- /dev/null
++++ b/patch-status/resources/dark.js
+@@ -0,0 +1,76 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++
++(function(root, factory) {
++    if (typeof define === 'function' && define.amd) {
++        // AMD. Register as an anonymous module.
++        define(['exports', 'echarts'], factory);
++    } else if (
++        typeof exports === 'object' &&
++        typeof exports.nodeName !== 'string'
++    ) {
++        // CommonJS
++        factory(exports, require('echarts/lib/echarts'));
++    } else {
++        // Browser globals
++        factory({}, root.echarts);
++    }
++})(this, function(exports, echarts) {
++    var log = function(msg) {
++        if (typeof console !== 'undefined') {
++            console && console.error && console.error(msg);
++        }
++    };
++    if (!echarts) {
++        log('ECharts is not Loaded');
++        return;
++    }
++    var axisCommon = function () {
++        return {
++            splitLine: {
++                lineStyle: {
++                    color: '#484753'
++                }
++            },
++        };
++    };
++
++    var theme = {
++        darkMode: true,
++        backgroundColor: '#13171f',
++        legend: {
++            textStyle: {
++                color: '#B9B8CE'
++            }
++        },
++        line: {
++            symbol: 'circle'
++        },
++        dataZoom: {
++            borderColor: '#71708A',
++            handleStyle: {
++                color: '#353450',
++                borderColor: '#C5CBE3'
++            },
++        },
++        valueAxis: axisCommon(),
++    };
++
++    echarts.registerTheme('dark', theme);
++});
+-- 
+2.39.3 (Apple Git-145)
+

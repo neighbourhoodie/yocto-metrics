@@ -1,0 +1,329 @@
+From ccc6f697962aac36887340330bfa3e632e832988 Mon Sep 17 00:00:00 2001
+From: Alex Feyerke <hello@alexfeyerke.com>
+Date: Wed, 8 May 2024 11:09:49 +0200
+Subject: [PATCH 12/12] index.html: linting and formatting
+
+Also corrects a minor padding issue in details elements.
+
+Signed-off-by: Alex Feyerke <hello@alexfeyerke.com>
+---
+ patch-status/index.html | 259 ++++++++++++++++++++--------------------
+ 1 file changed, 128 insertions(+), 131 deletions(-)
+
+diff --git a/patch-status/index.html b/patch-status/index.html
+index 86e8c9db..99ddbbd2 100644
+--- a/patch-status/index.html
++++ b/patch-status/index.html
+@@ -64,11 +64,8 @@ SPDX-License-Identifier: MIT
+     details {
+       margin-bottom: 0;
+     }
+-    details > ul {
+-      margin-left: 0;
+-      padding-left: 14px;
+-    }
+-    details > ul > li {
++
++    details>ul>li {
+       list-style-type: none;
+       font-size: 0.8em;
+     }
+@@ -361,34 +358,34 @@ SPDX-License-Identifier: MIT
+ 
+   <script type="text/javascript">
+     fetch('cve-status-master.txt')
+-   .then(response => response.text())
+-   .then(data => {
+-      createCVEList('cve_status_master', data);
+-   })
+-
+-   fetch('cve-status-scarthgap.txt')
+-   .then(response => response.text())
+-   .then(data => {
+-       createCVEList('cve_status_scarthgap', data);
+-   })
+-
+-   fetch('cve-status-nanbield.txt')
+-   .then(response => response.text())
+-   .then(data => {
+-       createCVEList('cve_status_nanbield', data);
+-   })
+-
+-   fetch('cve-status-kirkstone.txt')
+-   .then(response => response.text())
+-   .then(data => {
+-       createCVEList('cve_status_kirkstone', data);
+-   })
+-
+-   fetch('cve-status-dunfell.txt')
+-   .then(response => response.text())
+-   .then(data => {
+-       createCVEList('cve_status_dunfell', data);
+-   })
++      .then(response => response.text())
++      .then(data => {
++        createCVEList('cve_status_master', data);
++      })
++
++    fetch('cve-status-scarthgap.txt')
++      .then(response => response.text())
++      .then(data => {
++        createCVEList('cve_status_scarthgap', data);
++      })
++
++    fetch('cve-status-nanbield.txt')
++      .then(response => response.text())
++      .then(data => {
++        createCVEList('cve_status_nanbield', data);
++      })
++
++    fetch('cve-status-kirkstone.txt')
++      .then(response => response.text())
++      .then(data => {
++        createCVEList('cve_status_kirkstone', data);
++      })
++
++    fetch('cve-status-dunfell.txt')
++      .then(response => response.text())
++      .then(data => {
++        createCVEList('cve_status_dunfell', data);
++      })
+ 
+     function parseTxtFile(data) {
+       const cveData = {}
+@@ -422,8 +419,8 @@ SPDX-License-Identifier: MIT
+         html += "</ul>";
+         html += "</details>";
+         nestedDetails.innerHTML = html;
+-    };
+-   }
++      };
++    }
+   </script>
+ 
+   <!-- get the data -->
+@@ -448,7 +445,7 @@ SPDX-License-Identifier: MIT
+         trigger: 'axis'
+       },
+       legend: {},
+-      xAxis : { type: 'time' },
++      xAxis: { type: 'time' },
+       yAxis: { type: 'value' },
+       dataZoom: [
+         {
+@@ -472,7 +469,7 @@ SPDX-License-Identifier: MIT
+         // skip the header
+         for (let i = 1; i < lines.length; i++) {
+           const line = lines[i].split(",");
+-          if(line.length) {
++          if (line.length) {
+             const cve = {
+               name: line[0],
+               xAxis: new Date(line[1])
+@@ -510,109 +507,109 @@ SPDX-License-Identifier: MIT
+             generateCVEChart({ cve_data, releases });
+             return releases;
+           }).then((releases) => {
+-        fetch('patch-status-byday.json')
+-          .then(response => response.json())
+-          .then(data => {
+-            // We have to sort the data by date
+-            data.sort(function(x, y){
+-              return x.date - y.date;
+-            })
+-
+-            const patch_data = data.map(status => {
+-              return {
+-                date: new Date(status.date * 1000),
+-                total: status.total,
+-                pending: status.pending || 0,
+-                backport: status.backport || 0,
+-                inappropriate: status.inappropriate || 0,
+-                accepted: status.accepted || 0,
+-                submitted: status.submitted || 0,
+-                denied: status.denied || 0
+-              }
+-            })
+-
+-            const malformed_data = data.map(status => {
+-              return {
+-                date: new Date(status.date * 1000),
+-                total: status.total,
+-                upstream_status: status['malformed-upstream-status'] || 0,
+-                sob: status['malformed-sob'] || 0
+-              }
+-            })
+-
+-            const recipe_data = data.map(status => {
+-              return {
+-                date: new Date(status.date * 1000),
+-                recipe_count: status.recipe_count
+-              }
+-            })
+-
+-            generateMalformedChart({ malformed_data, releases });
+-            generateUpstreamChart({ patch_data, releases });
+-            generateRecipeChart({ recipe_data, releases });
++            fetch('patch-status-byday.json')
++              .then(response => response.json())
++              .then(data => {
++                // We have to sort the data by date
++                data.sort(function (x, y) {
++                  return x.date - y.date;
++                })
++
++                const patch_data = data.map(status => {
++                  return {
++                    date: new Date(status.date * 1000),
++                    total: status.total,
++                    pending: status.pending || 0,
++                    backport: status.backport || 0,
++                    inappropriate: status.inappropriate || 0,
++                    accepted: status.accepted || 0,
++                    submitted: status.submitted || 0,
++                    denied: status.denied || 0
++                  }
++                })
++
++                const malformed_data = data.map(status => {
++                  return {
++                    date: new Date(status.date * 1000),
++                    total: status.total,
++                    upstream_status: status['malformed-upstream-status'] || 0,
++                    sob: status['malformed-sob'] || 0
++                  }
++                })
++
++                const recipe_data = data.map(status => {
++                  return {
++                    date: new Date(status.date * 1000),
++                    recipe_count: status.recipe_count
++                  }
++                })
++
++                generateMalformedChart({ malformed_data, releases });
++                generateUpstreamChart({ patch_data, releases });
++                generateRecipeChart({ recipe_data, releases });
++              });
+           });
+-        });
+       });
+   </script>
+ 
+   <!-- cve_chart -->
+   <script type="text/javascript">
+-  const cveChart = echarts.init(document.getElementById('cve_chart'), theme);
+-
+-  const optionsforAllLineCharts = {
+-    grid: {
+-      left: 60,
+-      right: 60,
+-      top: 75,
+-      bottom: 90
+-    },
+-    animation: false
+-  }
+-
+-  const cveSeries = []
+-  const datasetWithFilters = []
+-  function generateCVEChart({ cve_data, releases }) {
+-    branches.forEach(branch => {
+-      datasetWithFilters.push({
+-        id: branch,
+-        fromDatasetId: 'dataset_raw',
+-        transform: {
+-          type: 'filter',
+-          config: {
+-            dimension: 'Branch', '=': branch,
++    const cveChart = echarts.init(document.getElementById('cve_chart'), theme);
++
++    const optionsforAllLineCharts = {
++      grid: {
++        left: 60,
++        right: 60,
++        top: 75,
++        bottom: 90
++      },
++      animation: false
++    }
++
++    const cveSeries = []
++    const datasetWithFilters = []
++    function generateCVEChart({ cve_data, releases }) {
++      branches.forEach(branch => {
++        datasetWithFilters.push({
++          id: branch,
++          fromDatasetId: 'dataset_raw',
++          transform: {
++            type: 'filter',
++            config: {
++              dimension: 'Branch', '=': branch,
++            }
+           }
+-        }
+-      });
+-      cveSeries.push({
+-        type: 'line',
+-        showSymbol: false,
+-        datasetId: branch,
+-        name: branch,
+-        encode: {
+-          x: 'Date',
+-          y: 'Branchvalue'
+-        }
++        });
++        cveSeries.push({
++          type: 'line',
++          showSymbol: false,
++          datasetId: branch,
++          name: branch,
++          encode: {
++            x: 'Date',
++            y: 'Branchvalue'
++          }
++        });
+       });
+-    });
+-    const cveOption = {
+-      legend: { right: 'auto' },
+-      ...general_options,
+-      dataset: [
+-        {
+-          id: 'dataset_raw',
+-          source: cve_data
+-        },
+-        ...datasetWithFilters
+-      ],
+-      series: [
+-        releases,
+-        ...cveSeries,
+-      ],
+-      ...optionsforAllLineCharts
+-    };
++      const cveOption = {
++        legend: { right: 'auto' },
++        ...general_options,
++        dataset: [
++          {
++            id: 'dataset_raw',
++            source: cve_data
++          },
++          ...datasetWithFilters
++        ],
++        series: [
++          releases,
++          ...cveSeries,
++        ],
++        ...optionsforAllLineCharts
++      };
+ 
+-    cveChart.setOption(cveOption);
+-  }
++      cveChart.setOption(cveOption);
++    }
+   </script>
+ 
+   <!-- pie chart -->
+-- 
+2.39.3 (Apple Git-145)
+

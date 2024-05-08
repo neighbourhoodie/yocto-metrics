@@ -1,0 +1,27 @@
+From dc7e2975031e27a42e2dcdc444a5c0f819ed19a7 Mon Sep 17 00:00:00 2001
+From: Alex Feyerke <hello@alexfeyerke.com>
+Date: Wed, 8 May 2024 10:25:13 +0200
+Subject: [PATCH 01/12] patch-status: add .gitignore file
+
+Don't commit generated files used for local development.
+
+Signed-off-by: Alex Feyerke <hello@alexfeyerke.com>
+---
+ .gitignore | 4 ++++
+ 1 file changed, 4 insertions(+)
+ create mode 100644 .gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 00000000..314548a8
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,4 @@
++# ignore generated data files
++patch-status/cve-count-byday.json
++patch-status/cve-status-*.txt
++patch-status/patch-status-*.json
+\ No newline at end of file
+-- 
+2.39.3 (Apple Git-145)
+
