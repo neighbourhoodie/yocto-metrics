@@ -412,9 +412,9 @@ SPDX-License-Identifier: MIT
         html += '<details>';
         html += `<summary class="sub">${name} CVEs</summary>`;
         html += "<ul>";
-        for (const cve of cves) {
+        for (const [index, cve] of cves.entries()) {
           html += '<li>'
-          html += `<a href="${cve}" target="_blank">${cve}</a>`
+          html += `${index + 1}: <a href="${cve}" target="_blank">${cve}</a>`
           html += '</li>';
         }
         html += "</ul>";
