@@ -34,6 +34,31 @@ SPDX-License-Identifier: MIT
       display: flex;
     }
 
+    dl {
+      display: grid;
+      grid-template-columns: auto auto;
+      color: var(--pico-h5-color);
+      margin-inline-start: 1.75em;
+      margin-block-start: 1em;
+    }
+
+    dt:hover,
+    dt:hover+dd,
+    dt:has(+ dd:hover),
+    dd:hover {
+      filter: brightness(15%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+
+      dt:hover,
+      dt:hover+dd,
+      dt:has(+ dd:hover),
+      dd:hover {
+        filter: brightness(150%);
+      }
+    }
+
     details {
       margin-bottom: 0;
     }
@@ -192,14 +217,119 @@ SPDX-License-Identifier: MIT
     </section>
 
     <section>
-      <h3>Patch Upstream-Status Counts (OE-Core meta directory)</h3>
-      <div id="upstream_status_chart" style="height:400px;"></div>
+      <h2>Patch Upstream-Status Counts (OE-Core meta directory)</h2>
+      <p>
+        The following two graphs provide insights into the status of patches in the OE-Core meta directory with respect to their upstream status.
+        The upstream status of a patch refers to its relationship with the original source or upstream project from which the patch originates.
+      </p>
+
+      <details>
+        <summary>
+          Upstream status categories explained
+        </summary>
+        <dl>
+          <dt><strong>Accepted</strong>:</dt>
+          <dd>
+            <p>The patch has been accepted upstream, meaning it has been applied to the original source code repository from which it originated.</p>
+            <p><em>A high count of accepted patches indicates successful contributions and integration of changes into the upstream project.</em></p>
+          </dd>
+
+          <dt><strong>Backport</strong>:</dt>
+          <dd>
+            <p>The patch has been backported from a newer version of the software or a different branch to an older version or a specific branch.</p>
+            <p><em>Backported patches show efforts to apply fixes or features from newer versions to older versions or specific branches.</em></p>
+          </dd>
+
+          <dt><strong>Deferred</strong>:</dt>
+          <dd>
+            <p>The patch has been postponed or deferred for later consideration or implementation.</p>
+            <p><em>Deferred patches might indicate areas where further review or discussion is needed before applying the patches upstream.</em></p>
+          </dd>
+
+          <dt><strong>Inappropriate</strong>:</dt>
+          <dd>
+            <p>This status indicates that the patch is deemed inappropriate for upstream inclusion.</p>
+            <p><em>High counts of inappropriate patches might indicate a need for better review processes or clearer guidelines for contributions.</em></p>
+          </dd>
+
+          <dt><strong>Submitted</strong>:</dt>
+          <dd>
+            <p>
+              The patch has been submitted upstream but hasn't received a definitive response yet.
+              It’s a transitional state between "Pending" and "Accepted" or "Rejected". Patches in this state are awaiting review and acceptance or rejection by upstream maintainers.
+            </p>
+            <p><em>Submitted patches reflect ongoing contributions to upstream projects. A high number of submitted patches might indicate active engagement with upstream maintainers.</em></p>
+          </dd>
+
+          <dt><strong>Pending</strong>:</dt>
+          <dd>
+            <p>The patch is pending review or has not yet been applied upstream.</p>
+            <p><em>High counts of pending patches might suggest a backlog in the review process or challenges in getting patches accepted upstream.</em></p>
+          </dd>
+
+          <dt><strong>Denied</strong>:</dt>
+          <dd>
+            <p>The patch has been rejected upstream, often due to conflicts, incompatibilities, or not meeting project standards.</p>
+            <p><em> Rejected patches could signify issues with patch quality, conflicts, or discrepancies between the patch and upstream requirements.</em></p>
+          </dd>
+
+          <dt><strong>Total</strong>:</dt>
+          <dd>
+            <p>The total count of patches in the OE-Core meta directory, regardless of their upstream status.</p>
+            <p><em>This provides context for the distribution of patches across different statuses.</em></p>
+          </dd>
+        </dl>
+      </details>
     </section>
 
+    <div id="upstream_status_chart" style="height:400px;"></div>
+
     <section>
-      <h3>Patch Tag Error Counts (OE-Core meta directory)</h3>
-      <div id="malformed_chart" style="height:400px;"></div>
+      <h2>Patch Tag Error Counts (OE-Core meta directory)</h2>
+      <p>The Patch Tag Error Counts graph shows the statuses "Malformed Upstream-Status" and "Malformed Signed-off-by" to provide insight into the quality and completeness of patches in the OE-Core meta directory.</p>
+      <details>
+        <summary>
+          Malformed status categories explained
+        </summary>
+        <dl>
+          <dt><strong>Malformed Upstream-Status</strong>:</dt>
+          <dd>
+            <p>This category indicates patches with improperly formatted or missing upstream status tags.</p>
+            <p>A malformed upstream status could be a result of missing or incorrectly formatted tags such as "Upstream-Status:", which is a common tag used to specify the status of the patch upstream.</p>
+            <p>Patches with malformed upstream status might not be properly tracked or considered for upstream inclusion, as they lack necessary metadata for review.</p>
+            <p>
+              <em>
+                High counts in this category might indicate issues with patch submission processes or lack of adherence to patch submission guidelines.
+                These patches might be at risk of being overlooked or rejected during the review process due to incomplete metadata.
+              </em>
+            </p>
+          </dd>
+          <dt><strong>Malformed Signed-off-by</strong>:</dt>
+          <dd>
+            <p>
+              This category represents patches with improperly formatted or missing "Signed-off-by" lines.
+              The "Signed-off-by" line in a patch is a tag that signifies the authorship and acknowledgment of the patch.
+              A malformed "Signed-off-by" line could be due to missing or incorrectly formatted authorship information.
+              Properly formatted "Signed-off-by" lines are essential for maintaining authorship attribution and legal compliance.
+            </p>
+            <p>
+              <em>
+                This category reflects issues with patch authorship and acknowledgment.
+                Patches with malformed "Signed-off-by" lines might lack proper attribution, which can lead to confusion about ownership and legal compliance.
+                Such patches might require additional verification or correction before being considered for inclusion.
+              </em>
+            </p>
+          </dd>
+          <dt><strong>Total</strong>:</dt>
+          <dd>
+            <p>The total count of patches in the OE-Core meta directory, regardless of their upstream status.</p>
+            <p><em>This provides context for the distribution of patches across different statuses.</em></p>
+          </dd>
+        </dl>
+      </details>
     </section>
+
+    <div id="malformed_chart" style="height:400px;"></div>
 
     <section>
       <h3>Recipe Count (OE-Core meta directory)</h3>
