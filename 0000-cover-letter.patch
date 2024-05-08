@@ -1,0 +1,46 @@
+From ccc6f697962aac36887340330bfa3e632e832988 Mon Sep 17 00:00:00 2001
+From: Alex Feyerke <hello@alexfeyerke.com>
+Date: Wed, 8 May 2024 11:17:07 +0200
+Subject: [PATCH 00/12] M12: Improve the Charts in the Metrics View
+
+Yocto produces large amounts of statistical data measuring many aspects of project health over long periods of time. Making these more accessible, searchable, and understandable directly contributes to the project’s long-term usefulness and usability, saving maintainers and other consumers time and effort, as well as enabling more and better insights into the data, which in turn leads to more informed actions. Better display of stats also better communicates the effect of Yocto’s efforts. The work will reduce the time maintainers allocate to administrative and analytical tasks, enabling them to focus on core work and bug resolution.
+
+Technical Details:
+
+- Improve the charts: Add descriptions to help users understand the data better, add dark theme styles for charts
+- Improve UX: Unify styles with other platforms for an overall cohesive look.
+- Improve typography, colours, accessibility, and styles
+- Improve the developer documentation: add README.md with local setup instructions
+
+Alex Feyerke (12):
+  patch-status: add .gitignore file
+  patch-status: add README.md file
+  index.html: clean up html and head sections
+  index.html: Add general description to first section
+  index.html: Add description to CVE trends section
+  index.html: Add description to patch status metric pie chart
+  index.html: add description to upstream status section
+  index.html: Add description to recipe count section
+  index.html: Move raw data to own section element
+  index.html: add line numbers to CVE link lists
+  index.html: Add dark mode to charts, improve chart layout
+  index.html: linting and formatting
+
+ .gitignore                                  |   4 +
+ README                                      |  64 ++
+ patch-status/index.html                     | 661 +++++++++++++-------
+ patch-status/resources/apple-touch-icon.png | Bin 0 -> 7683 bytes
+ patch-status/resources/dark.js              |  76 +++
+ patch-status/resources/favicon-16x16.png    | Bin 0 -> 792 bytes
+ patch-status/resources/favicon-32x32.png    | Bin 0 -> 1246 bytes
+ 7 files changed, 595 insertions(+), 210 deletions(-)
+ create mode 100644 .gitignore
+ create mode 100644 README
+ create mode 100644 patch-status/resources/apple-touch-icon.png
+ create mode 100644 patch-status/resources/dark.js
+ create mode 100644 patch-status/resources/favicon-16x16.png
+ create mode 100644 patch-status/resources/favicon-32x32.png
+
+-- 
+2.39.3 (Apple Git-145)
+
