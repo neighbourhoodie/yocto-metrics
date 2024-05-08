@@ -13,13 +13,21 @@ SPDX-License-Identifier: MIT
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/resources/favicon-16x16.png">
   <style>
-    h3 {
-      margin-left: 60px;
-      padding-top: 20px;
-    }
-    ul {
-      margin-left: 60px;
+    main {
       font-size: 0.9em;
+    }
+
+    section {
+      max-width: 55rem;
+      margin-inline: 3rem;
+    }
+
+    h1 {
+      padding-inline: 3rem;
+    }
+
+    h2 {
+      padding-top: 1em;
     }
     details {
       margin-bottom: 0;
@@ -32,23 +40,66 @@ SPDX-License-Identifier: MIT
       list-style-type: none;
       font-size: 0.8em;
     }
-    .cve-status {
-      display: flex;
-      margin: 0 60px;
-      align-items: stretch;
+
+    details summary::before {
+      display: block;
+      width: 1rem;
+      height: 1rem;
+      margin-inline-end: calc(var(--pico-spacing, 1rem)* .5);
+      float: left;
+      transform: rotate(-90deg);
+      background-image: var(--pico-icon-chevron);
+      background-position: right center;
+      background-size: 1rem auto;
+      background-repeat: no-repeat;
+      content: "";
+      transition: transform var(--pico-transition);
     }
-    .cve-status > details {
-      flex: 1;
+
+    details summary::after {
+      display: inline;
+      vertical-align: text-bottom;
+      width: auto;
+      background: none;
+      float: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.6em;
+      border: 2px solid;
+      border-radius: 1em;
+      padding-inline: 0.35em;
+      content: "Click to show";
     }
-    details > summary {
-      padding: 13px 14px;
+
+    .cve-status>details {
+      margin-block-end: 1em;
     }
-    details > summary:hover {
-      filter: invert(50%);
+
+    .cve-status details summary {
+      font-family: var(--pico-font-family-monospace);
     }
-    details[open] > summary {
+
+    .cve-status details summary:after {
+      display: none;
+    }
+
+    details[open]>summary {
       margin-bottom: 6px;
     }
+
+    details[open]>summary::before {
+      transform: rotate(0);
+    }
+
+    details[open]>summary::after {
+      transform: none;
+      content: "Click to hide";
+    }
+
+    details>summary:hover {
+      filter: invert(50%);
+    }
+
     summary.sub {
       font-size: 0.8em;
       padding: 6px 18px;
@@ -58,31 +109,57 @@ SPDX-License-Identifier: MIT
 
 <body>
   <main>
-    <h3>Current CVE status for OE-Core/Poky</h3>
-    <div class="cve-status">
-      <details>
-        <summary>master</summary>
-        <div id="cve_status_master"></div>
-      </details>
-      <details>
-        <summary>scarthgap</summary>
-        <div id="cve_status_scarthgap"></div>
-      </details>
-      <details>
-        <summary>nanbield</summary>
-        <div id="cve_status_nanbield"></div>
-      </details>
-      <details>
-        <summary>kirkstone</summary>
-        <div id="cve_status_kirkstone"></div>
-      </details>
-      <details>
-        <summary>dunfell</summary>
-        <div id="cve_status_dunfell"></div>
-      </details>
-    </div>
+    <h1>yocto-metrics</h1>
+    <section>
+      <p>This page shows Common Vulnerabilities and Exposures (CVEs) metrics gathered from the Yocto Project autobuilder in graphs. It is updated daily to show the current status of the project.</p>
+      <p>
+        Each graph (except the pie chart) has an <strong>x-axis</strong> and a <strong>y-axis:</strong>
+      </p>
+      <ul>
+        <li>The <strong>x-axis</strong> represents time. You can filter by time-range using the zoom bar at the bottom.</li>
+        <li>The <strong>y-axis</strong> represents the amount of something (CVEs, patches, errors etc.) at a particular point in time. You can zoom here as well, using the bar on the right.</li>
+      </ul>
+      <p>
+        Click on the items in the <strong>legend</strong> to toggle the visibility of the corresponding line on the graph.</p>
+      <p>
+        Note the grey, vertical lines representing <strong>releases</strong>.
+        These lines are not part of the graph’s data but are added to highlight release points in time. They denote the release of new versions or updates of the software. This helps you correlate vulnerability trends with software releases, which can indicate whether vulnerabilities were addressed in a particular release.
+      </p>
+    </section>
 
-    <!-- Prepare a DOM with a defined width and height for ECharts -->
+    <section>
+      <h2>Current CVE status for OE-Core/Poky</h2>
+      <p>
+        This section provides a detailed overview of the current status of CVEs for each branch in the <code>OE-Core/Poky</code> repository.</p>
+      <p>
+        When you click on a branch name, a summary count of CVEs related to that branch is displayed.
+        This count includes the total number of CVEs reported for that branch and so gives a quick overview of the security status of the branch.</p>
+      <p>
+        Below the summary count, you'll find links to more detailed information about CVEs for that branch. You can easily access more detailed information at the National Vulnerability Database (NVD), about CVEs for each branch by clicking on the provided links.</p>
+      <div class="cve-status">
+        <details>
+          <summary>master</summary>
+          <div id="cve_status_master"></div>
+        </details>
+        <details>
+          <summary>scarthgap</summary>
+          <div id="cve_status_scarthgap"></div>
+        </details>
+        <details>
+          <summary>nanbield</summary>
+          <div id="cve_status_nanbield"></div>
+        </details>
+        <details>
+          <summary>kirkstone</summary>
+          <div id="cve_status_kirkstone"></div>
+        </details>
+        <details>
+          <summary>dunfell</summary>
+          <div id="cve_status_dunfell"></div>
+        </details>
+      </div>
+    </section>
+
     <section>
       <h3>CVE Trends for OE-Core/Poky</h3>
       <div id='cve_chart' style='height:400px;'></div>
