@@ -29,6 +29,11 @@ SPDX-License-Identifier: MIT
     h2 {
       padding-top: 1em;
     }
+
+    .flex {
+      display: flex;
+    }
+
     details {
       margin-bottom: 0;
     }
@@ -173,8 +178,17 @@ SPDX-License-Identifier: MIT
     <div id='cve_chart' style='height:400px;'></div>
 
     <section>
-      <h3>Current Patch Status Pie</h3>
-      <div id='pie_chart' style='height:300px; width: 600px;'></div>
+      <h2>Current Patch Status Metrics</h2>
+      <div class="flex">
+        <div id='pie_chart' style='height:300px; width: 600px;'></div>
+        <div>
+          <p>
+            This graph shows the latest patch breakdown metrics.</p>
+          <p>
+            <strong>Hover over a section</strong> to see the amount of patches with each status.
+          </p>
+        </div>
+      </div>
     </section>
 
     <section>
