@@ -8,6 +8,8 @@ SPDX-License-Identifier: MIT
   <meta charset="UTF-8">
   <meta title="Yocto Autobuilder Patch Metrics" <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="resources/echarts.min.js"></script>
+  <!-- import dark theme -->
+  <script src="resources/dark.js"></script>
   <link rel="stylesheet" href="resources/pico.fluid.classless.min.css">
   <link rel="apple-touch-icon" sizes="144x144" href="/resources/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/resources/favicon-32x32.png">
@@ -426,6 +428,7 @@ SPDX-License-Identifier: MIT
 
   <!-- get the data -->
   <script type="text/javascript">
+    const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default'
     const status_names = {
       pending: 'Pending',
       backport: 'Backport',
@@ -554,11 +557,16 @@ SPDX-License-Identifier: MIT
 
   <!-- cve_chart -->
   <script type="text/javascript">
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    // dark mode
-    var cveChart = echarts.init(document.getElementById('cve_chart'), 'dark');
-  } else {
-    var cveChart = echarts.init(document.getElementById('cve_chart'));
+  const cveChart = echarts.init(document.getElementById('cve_chart'), theme);
+
+  const optionsforAllLineCharts = {
+    grid: {
+      left: 60,
+      right: 60,
+      top: 75,
+      bottom: 90
+    },
+    animation: false
   }
 
   const cveSeries = []
@@ -599,7 +607,8 @@ SPDX-License-Identifier: MIT
       series: [
         releases,
         ...cveSeries,
-      ]
+      ],
+      ...optionsforAllLineCharts
     };
 
     cveChart.setOption(cveOption);
@@ -608,12 +617,7 @@ SPDX-License-Identifier: MIT
 
   <!-- pie chart -->
   <script>
-    // dark mode
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      var pieChart = echarts.init(document.getElementById('pie_chart'), 'dark');
-    } else {
-      var pieChart = echarts.init(document.getElementById('pie_chart'));
-    }
+    const pieChart = echarts.init(document.getElementById('pie_chart'), theme);
 
     fetch('patch-status-pie.json')
       .then(response => response.json())
@@ -652,12 +656,7 @@ SPDX-License-Identifier: MIT
 
   <!-- patch status -->
   <script type="text/javascript">
-    // dark mode
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      var upstreamStatusChart = echarts.init(document.getElementById('upstream_status_chart'), 'dark');
-    } else {
-      var upstreamStatusChart = echarts.init(document.getElementById('upstream_status_chart'));
-    }
+    const upstreamStatusChart = echarts.init(document.getElementById('upstream_status_chart'), theme);
 
     function generateUpstreamChart({ patch_data, releases }) {
       releases.markLine.label.position = 'insideEndTop';
@@ -678,7 +677,8 @@ SPDX-License-Identifier: MIT
         series: [
           releases,
           ...upstreamSeries
-        ]
+        ],
+        ...optionsforAllLineCharts
       };
 
       upstreamStatusChart.setOption(upstreamOption);
@@ -687,11 +687,7 @@ SPDX-License-Identifier: MIT
 
   <!-- malformed upstream -->
   <script type="text/javascript">
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      var malformedChart = echarts.init(document.getElementById('malformed_chart'), 'dark');
-    } else {
-      var malformedChart = echarts.init(document.getElementById('malformed_chart'));
-    }
+    const malformedChart = echarts.init(document.getElementById('malformed_chart'), theme);
 
     function generateMalformedChart({ malformed_data, releases }) {
       releases.markLine.label.position = 'insideEndTop';
@@ -713,7 +709,8 @@ SPDX-License-Identifier: MIT
         series: [
           releases,
           ...malformedSeries
-        ]
+        ],
+        ...optionsforAllLineCharts
       };
 
       malformedChart.setOption(malformedOption);
@@ -722,11 +719,7 @@ SPDX-License-Identifier: MIT
 
   <!-- recipe count -->
   <script type="text/javascript">
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      var recipeChart = echarts.init(document.getElementById('recipe_chart'), 'dark');
-    } else {
-      var recipeChart = echarts.init(document.getElementById('recipe_chart'));
-    }
+    const recipeChart = echarts.init(document.getElementById('recipe_chart'), theme);
 
     function generateRecipeChart({ recipe_data, releases }) {
       releases.markLine.label.position = 'insideEndTop';
@@ -742,7 +735,8 @@ SPDX-License-Identifier: MIT
             name: 'Recipe Count',
             areaStyle: {},
           }
-        ]
+        ],
+        ...optionsforAllLineCharts
       };
 
       recipeChart.setOption(recipeOption);
